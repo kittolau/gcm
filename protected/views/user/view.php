@@ -1,0 +1,154 @@
+<?php
+/* @var $this IllustController */
+/* @var $dataProvider CActiveDataProvider */
+
+$this->breadcrumbs=array(
+	'Illusts',
+);
+?>
+<?php
+$this->pageTitle = CHtml::encode($user->nickname)." - ";
+?>
+<ol class="breadcrumb">
+    <li class="active"> <span class="glyphicon glyphicon-chevron-down"></span> 用戶資料</li>
+</ol>
+		<table class="table table-hover">
+			<tbody>
+			<tr>
+			<td>自我介紹：</td>
+			<td>
+                            <?php echo CHtml::encode($user->summary)?>
+			</td>
+
+			</tr>
+			<tr>
+			<td>連絡方式：</td>
+			<td><?php echo CHtml::encode($user->email)?></td>
+                        
+			</tr>
+                        <tr>
+			<td>加入日期：</td>
+			<td><?php echo CHtml::encode($user->created_datetime)?></td>
+                        
+			</tr>
+                        <tr>
+			<td>作者網頁：</td>
+			<td><?php echo CHtml::encode($user->website_url)?></td>
+                        
+			</tr>
+			</tbody>
+		</table>
+<ol class="breadcrumb">
+    <li class="active"> <span class="glyphicon glyphicon-chevron-down"></span> 喜歡的用戶</li>
+</ol>
+			<div class="panel ">
+                            <div class="panel-body">
+                                <div class="panel-body zeroPanding">
+                                    <?php $user_id = $user->id ?>
+                                    <?php $followingUsers = $user->getFollowingUsers() ?>
+                                    <?php foreach($followingUsers as $followUser){ ?>
+                                    <div class="pull-left followingIcon">
+					<a href="<?php echo Yii::app()->createUrl('user/view',SeoHelper::userViewSEORouteArrayParam($followUser))?>" rel="tooltip" title="<?php echo CHtml::encode($followUser->nickname)?>">
+						<img class="img-responsive"  src="<?php echo Yii::app()->request->baseUrl; ?>/<?php echo CHtml::encode($followUser->icon_src)?>" alt="post image">
+					</a>
+                                    </div>
+                                    <?php } ?>
+				</div>
+                            </div>
+			</div>
+			
+			<div class="row">
+				<div class="col-xs-12">
+					<a class="btn btn-link btn-md pull-right" href="#">  more... </a>
+					<span class="clearfix"></span>
+				</div>
+			</div>
+<ol class="breadcrumb">
+    <li class="active"> <span class="glyphicon glyphicon-chevron-down"></span> 喜歡這用戶的用戶</li>
+</ol>
+<div class="panel ">
+                            <div class="panel-body">
+                                <div class="panel-body zeroPanding">
+                                    <?php $user_id2 = $user->id ?>
+                                    <?php $followedUsers = $user->getFollowedUsers() ?>
+                                    <?php foreach($followedUsers as $followedUser){ ?>
+                                    <div class="pull-left followingIcon">
+					<a href="<?php echo Yii::app()->createUrl('user/view',SeoHelper::userViewSEORouteArrayParam($followedUser))?>" rel="tooltip" title="<?php echo CHtml::encode($followedUser->nickname)?>">
+						<img class="img-responsive"  src="<?php echo Yii::app()->request->baseUrl; ?>/<?php echo CHtml::encode($followedUser->icon_src)?>" alt="post image">
+					</a>
+                                    </div>
+                                    <?php } ?>
+				</div>
+                            </div>
+			</div>
+			
+			<div class="row">
+				<div class="col-xs-12">
+					<a class="btn btn-link btn-md pull-right" href="#">  more... </a>
+					<span class="clearfix"></span>
+				</div>
+			</div>
+<ol class="breadcrumb">
+    <li class="active"> <span class="glyphicon glyphicon-chevron-down"></span> 作品列表</li>
+</ol>
+
+        <?php $form=$this->beginWidget('CActiveForm', array(
+	'action' => Yii::app()->createUrl($this->route),
+        'method' => 'get',
+        )); ?>
+        <input type="hidden" name="id" value="<?php echo $user->id?>">
+						<div class="row">
+							<?php $this->renderPartial('/site/_BSFilterDropDownListWidget',array(
+                                                            'form'=>$form,
+                                                            'fieldName'=>'illust_category_enum',
+                                                            'model'=>$model,
+                                                        ))?>
+
+							<?php $this->renderPartial('/site/_BSSortDropDownListWidget',array(
+                                                            'model'=>$model,
+                                                            'form'=>$form,
+                                                            'defaultDesc'=>false
+                                                        ))?>
+                                                    
+                                                    <?php $this->renderPartial('/site/_BSSortRevertWidget',array(
+                                                            'model'=>$model,
+                                                            'defaultDesc'=>false
+                                                        ))?>
+						</div>
+<?php $this->endWidget(); ?>
+
+
+<?php $this->widget('zii.widgets.CListView', array(
+	'dataProvider'=>$model->onlyBelongToUser($user->id)->applyUserPreference()->search(),
+        'emptyText'=>'沒有相關作品',
+        'enablePagination'=>true,
+        'summaryText'=>'共 {count} 作品',
+        'template'=>'<div class="pagination pull-right"><h6>{summary}</h6></div>{pager}<div class="clearfix"></div>{items}{pager}',
+	'itemView'=>'application.views.illust._singleIllustItem',
+        'afterAjaxUpdate'=>  JSHelper::ListViewAfterAjaxUpdate(),
+        'ajaxUpdate' => true,  // This is it.
+        'itemsCssClass'=>'row', //there will be a div wrapping all items
+        'pagerCssClass'=>'whatever',//there will be a div wrapping pager
+        //'updateSelector'=>'.pagination li a',
+        'pager'=>array(
+							'maxButtonCount'=>5,
+							'cssFile'=>null,
+							'pageSize' => 6,
+							//'class'=>'customLinkPager',
+							'header'=>'',
+
+							'firstPageLabel' => '|&lt;',
+							'prevPageLabel' => '&lt;',
+							'nextPageLabel' => '&gt;',
+							'lastPageLabel' => '&gt;|',
+
+							'hiddenPageCssClass'=>'disabled',
+							'internalPageCssClass'=>'', //for 1 , 2 , 3 ,4
+							'nextPageCssClass'=>'',
+							'previousPageCssClass'=>'',
+							'lastPageCssClass'=>'',
+							'firstPageCssClass'=>'',
+							'selectedPageCssClass'=>'active', //for selected li
+							'htmlOptions'=>array('class'=>'pagination'), //for ul
+							),
+)); ?>

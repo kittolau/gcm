@@ -1,0 +1,13 @@
+/img/Group/*
+/img/GroupProduct/*
+/img/illust/*
+/img/Event/*
+/assets/*
+/protected/runtime/*
+/nbproject/*
+/nbproject/*/*
+/gulp/*
+/compass/*
+
+
+/vendor/
